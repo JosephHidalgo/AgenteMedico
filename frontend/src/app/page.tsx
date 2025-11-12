@@ -1,65 +1,154 @@
-import Image from "next/image";
+import DashboardLayout from "@/components/DashboardLayout";
+import VirtualAssistant from "@/components/VirtualAssistant";
+import HealthCard from "@/components/HealthCard";
+import AppointmentCard from "@/components/AppointmentCard";
+import { Activity, Calendar, Heart, Pill, TrendingUp, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Home() {
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <DashboardLayout>
+      <div className="space-y-8">
+        {/* Welcome Section */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Sistema de Gestión de Citas Médicas
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground">
+            Visualiza las citas programadas y gestiona el calendario médico
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Statistics Grid */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <HealthCard
+            title="Citas Hoy"
+            icon={Calendar}
+            value="5"
+            subtitle="Citas programadas para hoy"
+            iconClassName="bg-secondary/10 text-secondary"
+          />
+          <HealthCard
+            title="Citas Esta Semana"
+            icon={Activity}
+            value="18"
+            subtitle="Próximas 7 días"
+            iconClassName="bg-primary/10 text-primary"
+          />
+          <HealthCard
+            title="Total de Pacientes"
+            icon={Heart}
+            value="247"
+            subtitle="Pacientes registrados"
+            iconClassName="bg-accent/10 text-accent"
+          />
+          <HealthCard
+            title="Doctores Activos"
+            icon={Pill}
+            value="12"
+            subtitle="Disponibles hoy"
+            iconClassName="bg-destructive/10 text-destructive"
+          />
         </div>
-      </main>
-    </div>
+
+        {/* Main Content Grid */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Today's Appointments */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Citas de Hoy
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <AppointmentCard
+                doctor="Dra. María García"
+                specialty="Medicina General"
+                date="1 Nov 2025"
+                time="10:00 AM"
+                location="Consulta 203, Clínica Central"
+                type="today"
+              />
+              <AppointmentCard
+                doctor="Dr. Carlos Rodríguez"
+                specialty="Cardiología"
+                date="1 Nov 2025"
+                time="3:30 PM"
+                location="Consulta 105, Hospital Norte"
+                type="today"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Appointments */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-secondary" />
+                Próximas Citas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <AppointmentCard
+                doctor="Dr. Luis Martínez"
+                specialty="Pediatría"
+                date="2 Nov 2025"
+                time="9:00 AM"
+                location="Consulta 301, Clínica Infantil"
+                type="upcoming"
+              />
+              <AppointmentCard
+                doctor="Dra. Ana López"
+                specialty="Dermatología"
+                date="3 Nov 2025"
+                time="11:30 AM"
+                location="Consulta 405, Centro Médico"
+                type="upcoming"
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* System Alerts */}
+        <Card className="border-l-4 border-l-secondary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-secondary" />
+              Notificaciones del Sistema
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex h-2 w-2 mt-2 rounded-full bg-secondary" />
+                <div>
+                  <p className="font-medium text-foreground">
+                    Confirmación pendiente
+                  </p>
+                  <p className="text-sm text-muted-foreground">2 citas requieren confirmación</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex h-2 w-2 mt-2 rounded-full bg-primary" />
+                <div>
+                  <p className="font-medium text-foreground">
+                    Nuevas citas registradas
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    3 citas nuevas en las últimas 24 horas
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Virtual Assistant */}
+      <VirtualAssistant />
+    </DashboardLayout>
   );
-}
+};
+
+export default Index;

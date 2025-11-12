@@ -1,0 +1,27 @@
+# Django Framework
+Django==5.1.2
+djangorestframework==3.14.0
+
+# Base de datos PostgreSQL
+psycopg2-binary==2.9.9
+
+# Redis y Cache
+django-redis==5.4.0
+redis==5.0.1
+hiredis==2.3.2
+
+# OpenAI API
+openai==1.97.0
+
+# Variables de entorno
+python-decouple==3.8
+
+# Generación de PDFs
+reportlab==4.0.7
+Pillow==10.1.0
+
+# CORS
+django-cors-headers==4.3.1
+
+# Utilidades
+pytz==2024.1
