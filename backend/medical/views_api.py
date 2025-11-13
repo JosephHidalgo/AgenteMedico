@@ -242,11 +242,30 @@ class CitaListView(APIView):
         if medico_id:
             citas = citas.filter(medico_id=medico_id)
         
+        # Filtro de fecha específica
         fecha_param = request.query_params.get('fecha')
         if fecha_param:
             try:
                 fecha = datetime.strptime(fecha_param, '%Y-%m-%d').date()
                 citas = citas.filter(fecha=fecha)
+            except ValueError:
+                pass
+        
+        # Filtro de rango de fechas
+        fecha_desde = request.query_params.get('fecha_desde')
+        fecha_hasta = request.query_params.get('fecha_hasta')
+        
+        if fecha_desde:
+            try:
+                fecha_d = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+                citas = citas.filter(fecha__gte=fecha_d)
+            except ValueError:
+                pass
+        
+        if fecha_hasta:
+            try:
+                fecha_h = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+                citas = citas.filter(fecha__lte=fecha_h)
             except ValueError:
                 pass
         

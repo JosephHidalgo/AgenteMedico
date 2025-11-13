@@ -120,3 +120,105 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===================================
+   Estilos para React Calendar
+   =================================== */
+
+.calendario-container .react-calendar {
+  @apply w-full bg-card border-none shadow-none font-sans;
+}
+
+.calendario-container .react-calendar__navigation {
+  @apply mb-4 flex items-center gap-2;
+}
+
+.calendario-container .react-calendar__navigation button {
+  @apply min-w-[44px] h-11 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-medium transition-colors text-sm sm:text-base;
+}
+
+.calendario-container .react-calendar__navigation button:disabled {
+  @apply bg-muted/50 cursor-not-allowed opacity-50;
+}
+
+.calendario-container .react-calendar__navigation__label {
+  @apply flex-1 text-sm sm:text-base font-semibold;
+}
+
+.calendario-container .react-calendar__month-view__weekdays {
+  @apply text-xs sm:text-sm font-medium text-muted-foreground mb-2;
+}
+
+.calendario-container .react-calendar__month-view__weekdays__weekday {
+  @apply p-1 sm:p-2 text-center;
+}
+
+.calendario-container .react-calendar__month-view__weekdays__weekday abbr {
+  @apply no-underline;
+}
+
+.calendario-container .react-calendar__tile {
+  @apply relative h-14 sm:h-16 p-1 sm:p-2 text-xs sm:text-sm font-medium text-foreground bg-card hover:bg-muted/50 rounded-lg transition-all;
+}
+
+.calendario-container .react-calendar__tile:enabled:hover,
+.calendario-container .react-calendar__tile:enabled:focus {
+  @apply bg-muted;
+}
+
+.calendario-container .react-calendar__tile--now {
+  @apply bg-primary/10 text-primary font-bold;
+}
+
+.calendario-container .react-calendar__tile--active {
+  @apply bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2;
+}
+
+.calendario-container .react-calendar__tile--active:enabled:hover,
+.calendario-container .react-calendar__tile--active:enabled:focus {
+  @apply bg-primary/90;
+}
+
+/* Colores según estado de citas */
+.calendario-container .react-calendar__tile.cita-agendada {
+  @apply bg-green-500/20 border-2 border-green-500 font-bold hover:bg-green-500/30;
+}
+
+.calendario-container .react-calendar__tile.cita-completada {
+  @apply bg-blue-500/20 border-2 border-blue-500 font-bold hover:bg-blue-500/30;
+}
+
+.calendario-container .react-calendar__tile.cita-cancelada {
+  @apply bg-red-500/20 border-2 border-red-500 font-bold hover:bg-red-500/30;
+}
+
+.calendario-container .react-calendar__tile.cita-agendada.react-calendar__tile--active {
+  @apply bg-green-600 text-white border-green-600;
+}
+
+.calendario-container .react-calendar__tile.cita-completada.react-calendar__tile--active {
+  @apply bg-blue-600 text-white border-blue-600;
+}
+
+.calendario-container .react-calendar__tile.cita-cancelada.react-calendar__tile--active {
+  @apply bg-red-600 text-white border-red-600;
+}
+
+.calendario-container .react-calendar__tile.tiene-citas {
+  @apply font-bold;
+}
+
+.calendario-container .react-calendar__month-view__days__day--neighboringMonth {
+  @apply text-muted-foreground/40;
+}
+
+.calendario-container .react-calendar__month-view__days__day--weekend {
+  @apply text-foreground;
+}
+
+.calendario-container .react-calendar__year-view__months__month,
+.calendario-container .react-calendar__decade-view__years__year,
+.calendario-container .react-calendar__century-view__decades__decade {
+  @apply h-16 rounded-lg hover:bg-muted transition-colors;
+}
+

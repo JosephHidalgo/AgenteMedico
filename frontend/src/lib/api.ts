@@ -36,6 +36,33 @@ export interface CitasResponse {
   citas: Cita[];
 }
 
+export interface Medico {
+  id: number;
+  nombre: string;
+  apellido_paterno: string;
+  nombre_completo: string;
+  especialidad: string;
+  sub_especialidad: string;
+  cedula_profesional: string;
+  cedula_especialidad: string;
+  anos_experiencia: number;
+  universidad: string;
+  biografia: string;
+  telefono: string;
+  email: string;
+  direccion: string;
+  costo_consulta: string;
+  duracion_consulta_minutos: number;
+  acepta_nuevos_pacientes: boolean;
+  activo: boolean;
+}
+
+export interface MedicosResponse {
+  exito: boolean;
+  cantidad: number;
+  medicos: Medico[];
+}
+
 // ====================================
 // UTILIDADES
 // ====================================
@@ -91,6 +118,7 @@ export const citasService = {
   listar: async (filtros?: {
     estado?: string;
     medico?: number;
+    fecha?: string;
     fecha_desde?: string;
     fecha_hasta?: string;
     paciente_email?: string;
@@ -147,8 +175,8 @@ export const medicosService = {
   /**
    * Lista todos los médicos activos
    */
-  listar: async () => {
-    return fetchAPI('/api/medicos/');
+  listar: async (): Promise<MedicosResponse> => {
+    return fetchAPI<MedicosResponse>('/api/medicos/');
   },
 
   /**
