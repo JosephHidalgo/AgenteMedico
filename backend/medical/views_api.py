@@ -449,3 +449,58 @@ class CitaCancelarView(APIView):
                 'exito': False,
                 'error': mensaje
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ====================
+# ESTADÍSTICAS
+# ====================
+
+class EstadisticasView(APIView):
+    """
+    GET /api/estadisticas/
+    Retorna estadísticas generales del sistema optimizadas para dashboard
+    
+    Response:
+        {
+            "exito": true,
+            "citas_hoy": 5,
+            "citas_semana": 18,
+            "total_pacientes": 247,
+            "doctores_activos": 12
+        }
+    """
+    
+    def get(self, request):
+        from datetime import timedelta
+        from .models import Paciente
+        
+        hoy = date.today()
+        fin_semana = hoy + timedelta(days=7)
+        
+        # Contar citas de hoy
+        citas_hoy = Cita.objects.filter(
+            fecha=hoy,
+            estado='AGENDADA'
+        ).count()
+        
+        # Contar citas de la semana
+        citas_semana = Cita.objects.filter(
+            fecha__gte=hoy,
+            fecha__lt=fin_semana,
+            estado='AGENDADA'
+        ).count()
+        
+        # Total de pacientes activos
+        total_pacientes = Paciente.objects.filter(activo=True).count()
+        
+        # Doctores activos
+        doctores_activos = Medico.objects.filter(activo=True).count()
+        
+        return Response({
+            'exito': True,
+            'citas_hoy': citas_hoy,
+            'citas_semana': citas_semana,
+            'total_pacientes': total_pacientes,
+            'doctores_activos': doctores_activos
+        }, status=status.HTTP_200_OK)
+

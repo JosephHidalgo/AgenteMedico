@@ -59,6 +59,12 @@ class Paciente(models.Model):
         return today.year - self.fecha_nacimiento.year - (
             (today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
         )
+    
+    def nombre_completo(self):
+        """Retorna el nombre completo del paciente"""
+        if self.apellido_materno:
+            return f"{self.nombre} {self.apellido_paterno} {self.apellido_materno}"
+        return f"{self.nombre} {self.apellido_paterno}"
 
 
 class Medico(models.Model):

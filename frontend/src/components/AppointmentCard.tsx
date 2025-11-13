@@ -1,41 +1,63 @@
-import { Calendar, Clock, MapPin, User } from "lucide-react";
+import { Calendar, Clock, MapPin, User, UserCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 interface AppointmentCardProps {
   doctor: string;
   specialty: string;
+  patient?: string;
   date: string;
   time: string;
   location: string;
-  type: "upcoming" | "today" | "past";
+  status?: "AGENDADA" | "COMPLETADA" | "CANCELADA" | "EXPIRADA";
+  isToday?: boolean;
 }
 
 export default function AppointmentCard({
   doctor,
   specialty,
+  patient,
   date,
   time,
   location,
-  type,
+  status = "AGENDADA",
+  isToday = false,
 }: AppointmentCardProps) {
-  const getTypeColor = () => {
-    switch (type) {
-      case "today":
-        return "bg-secondary text-secondary-foreground";
-      case "upcoming":
-        return "bg-primary/10 text-primary";
-      case "past":
-        return "bg-muted text-muted-foreground";
+  const getStatusColor = () => {
+    switch (status) {
+      case "AGENDADA":
+        return "bg-green-500/10 text-green-700 dark:text-green-400";
+      case "COMPLETADA":
+        return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+      case "CANCELADA":
+        return "bg-red-500/10 text-red-700 dark:text-red-400";
+      case "EXPIRADA":
+        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+      default:
+        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+    }
+  };
+
+  const getStatusLabel = () => {
+    switch (status) {
+      case "AGENDADA":
+        return "Agendada";
+      case "COMPLETADA":
+        return "Completada";
+      case "CANCELADA":
+        return "Cancelada";
+      case "EXPIRADA":
+        return "Expirada";
+      default:
+        return status;
     }
   };
 
   return (
-    <Card className="p-4 transition-all hover:shadow-md">
+    <Card className={`p-4 transition-all hover:shadow-md ${isToday ? 'border-2 border-secondary shadow-lg' : ''}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
+          <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${isToday ? 'from-secondary to-secondary/80' : 'from-primary to-primary-glow'} text-primary-foreground`}>
             <User className="h-6 w-6" />
           </div>
           <div>
@@ -43,12 +65,25 @@ export default function AppointmentCard({
             <p className="text-sm text-muted-foreground">{specialty}</p>
           </div>
         </div>
-        <Badge className={getTypeColor()}>
-          {type === "today" ? "Hoy" : type === "upcoming" ? "Próxima" : "Pasada"}
-        </Badge>
+        <div className="flex flex-col gap-1 items-end">
+          {isToday && (
+            <Badge className="bg-secondary text-secondary-foreground">
+              Hoy
+            </Badge>
+          )}
+          <Badge className={getStatusColor()}>
+            {getStatusLabel()}
+          </Badge>
+        </div>
       </div>
 
       <div className="space-y-2 text-sm text-muted-foreground">
+        {patient && (
+          <div className="flex items-center gap-2">
+            <UserCheck className="h-4 w-4" />
+            <span className="font-medium text-foreground">{patient}</span>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
           <span>{date}</span>
@@ -62,21 +97,6 @@ export default function AppointmentCard({
           <span>{location}</span>
         </div>
       </div>
-
-      {type !== "past" && (
-        <div className="mt-4 flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
-            Reprogramar
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
-            Confirmar
-          </Button>
-        </div>
-      )}
     </Card>
   );
 }

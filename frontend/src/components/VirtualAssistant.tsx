@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, X, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,6 +15,7 @@ interface Message {
 }
 
 export default function VirtualAssistant() {
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -68,91 +69,122 @@ export default function VirtualAssistant() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-50 flex flex-col w-96 h-[600px] bg-card rounded-2xl shadow-lg border border-border overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center gap-3 bg-gradient-to-r from-primary to-primary-glow p-4 text-primary-foreground">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-          <Bot className="h-6 w-6" />
-        </div>
-        <div>
-          <h3 className="font-semibold">Asistente Virtual</h3>
-          <p className="text-xs opacity-90">Siempre disponible para ayudarte</p>
-        </div>
-      </div>
+    <>
+      {/* Botón Flotante para abrir el chat */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+          aria-label="Abrir asistente virtual"
+        >
+          <MessageCircle className="h-8 w-8 group-hover:animate-pulse" />
+          <span className="absolute -top-1 -right-1 flex h-5 w-5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-secondary"></span>
+          </span>
+        </button>
+      )}
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex gap-3",
-                message.role === "user" ? "justify-end" : "justify-start"
-              )}
+      {/* Ventana del Chat */}
+      {isOpen && (
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col w-96 h-[600px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-primary to-primary-glow p-4 text-primary-foreground">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                <Bot className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Asistente Virtual</h3>
+                <p className="text-xs opacity-90">Siempre disponible para ayudarte</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(false)}
+              className="h-8 w-8 rounded-full hover:bg-white/20 text-primary-foreground"
+              aria-label="Cerrar asistente virtual"
             >
-              {message.role === "assistant" && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Bot className="h-5 w-5" />
-                </div>
-              )}
-              <div
-                className={cn(
-                  "max-w-[75%] rounded-2xl px-4 py-2.5",
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
-                )}
-              >
-                <p className="text-sm leading-relaxed">{message.content}</p>
-                <span className="text-xs opacity-60 mt-1 block">
-                  {message.timestamp.toLocaleTimeString("es-ES", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-              {message.role === "user" && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10 text-secondary">
-                  <User className="h-5 w-5" />
-                </div>
-              )}
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex gap-3 justify-start">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Bot className="h-5 w-5" />
-              </div>
-              <div className="bg-muted rounded-2xl px-4 py-2.5">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              </div>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
 
-      {/* Input */}
-      <div className="border-t border-border p-4 bg-muted/30">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Escribe tu consulta..."
-            className="flex-1 border-border bg-background"
-            disabled={isLoading}
-          />
-          <Button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            size="icon"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary"
-          >
-            <Send className="h-5 w-5" />
-          </Button>
+          {/* Messages */}
+          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex gap-3",
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  )}
+                >
+                  {message.role === "assistant" && (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Bot className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "max-w-[75%] rounded-2xl px-4 py-2.5",
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    )}
+                  >
+                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <span className="text-xs opacity-60 mt-1 block">
+                      {message.timestamp.toLocaleTimeString("es-ES", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                  {message.role === "user" && (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10 text-secondary">
+                      <User className="h-5 w-5" />
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex gap-3 justify-start">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Bot className="h-5 w-5" />
+                  </div>
+                  <div className="bg-muted rounded-2xl px-4 py-2.5">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          {/* Input */}
+          <div className="border-t border-border p-4 bg-muted/30">
+            <div className="flex gap-2">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Escribe tu consulta..."
+                className="flex-1 border-border bg-background"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading}
+                size="icon"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary"
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

@@ -19,6 +19,8 @@ from medical.views_api import (
     CitaDetailView,
     CitaPDFView,
     CitaCancelarView,
+    # Estadísticas
+    EstadisticasView,
 )
 
 app_name = 'medical'
@@ -46,5 +48,10 @@ urlpatterns = [
     path('api/citas/<int:pk>/', CitaDetailView.as_view(), name='cita_detail'),
     path('api/citas/<int:pk>/pdf/', CitaPDFView.as_view(), name='cita_pdf'),
     path('api/citas/<int:pk>/cancelar/', CitaCancelarView.as_view(), name='cita_cancelar'),
+    
+    # ======================
+    # ESTADÍSTICAS
+    # ======================
+    path('api/estadisticas/', EstadisticasView.as_view(), name='estadisticas'),
 ]
 
