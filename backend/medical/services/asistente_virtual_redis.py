@@ -7,6 +7,7 @@ from openai import OpenAI
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
+from datetime import datetime, timedelta
 import uuid
 import json
 import re
@@ -51,12 +52,16 @@ Tu función principal es:
 3. **SI EL USUARIO QUIERE AGENDAR CITA**:
    - Si vino de evaluación de síntomas, sugiere la especialidad apropiada
    - Si es directo, pregunta: "¿Qué especialidad médica necesitas?"
-   - Una vez definida la especialidad, SOLICITA sus datos personales:
-     * Nombre completo
+   - Una vez definida la especialidad, SOLICITA sus datos personales EN ESTE ORDEN:
+     * Nombre completo (nombre y apellidos)
      * Edad
      * Email
      * Teléfono
-   - Confirma los datos antes de proceder
+   - Solicita UN dato a la vez, espera la respuesta antes de pedir el siguiente
+   - DESPUÉS de recopilar TODOS los datos (nombre, apellidos, edad, email, teléfono), di EXACTAMENTE:
+     "Perfecto, ya tengo toda tu información. Haz clic en el botón 'Crear Cita Ahora' para confirmar tu cita."
+   - NO menciones fechas u horas específicas, el sistema las asignará automáticamente
+   - NO intentes crear la cita tú mismo, el usuario debe hacer clic en el botón
 
 4. **DETECCIÓN DE INTENCIÓN**:
    - Identifica si el usuario quiere: [SINTOMAS] o [AGENDAR_CITA]
@@ -66,11 +71,13 @@ Tu función principal es:
    - Respuestas claras y breves
    - Usa emojis moderadamente
    - Guía al usuario paso a paso
+   - Solicita UN dato a la vez
 
 6. **IMPORTANTE**:
    - NO diagnostiques
    - Si detectas síntomas graves, recomienda atención inmediata
    - Sé empático pero profesional
+   - NO inventes fechas u horas de citas, el sistema las asignará
 
 **SÍNTOMAS DE ALARMA** (requieren atención urgente):
 - Dolor de pecho intenso
@@ -378,3 +385,369 @@ Por favor, cuéntame en qué puedo asistirte."""
         cache_key = self._get_cache_key(conversacion_id)
         cache.delete(cache_key)
         return True
+    
+    def extraer_datos_paciente(self, conversacion_id):
+        """
+        Extrae los datos del paciente de la conversación usando IA
+        
+        Args:
+            conversacion_id (str): UUID de la conversación
+        
+        Returns:
+            dict: Datos extraídos del paciente o None si no hay suficiente información
+        """
+        conversacion = self.obtener_conversacion(conversacion_id)
+        
+        if not conversacion:
+            return None
+        
+        # Obtener TODA la conversación excluyendo el system prompt
+        mensajes_conversacion = [
+            f"{'Usuario' if m['role'] == 'user' else 'Asistente'}: {m['content']}"
+            for m in conversacion['mensajes']
+            if m['role'] != 'system'
+        ]
+        
+        texto_completo = '\n'.join(mensajes_conversacion)
+        
+        print(f"[DEBUG] Conversación para extracción:\n{texto_completo[:500]}...")
+        
+        # Usar OpenAI para extraer datos estructurados
+        prompt_extraccion = f"""Analiza la siguiente conversación completa entre un usuario y un asistente médico.
+Extrae los datos personales del paciente que fueron mencionados.
+
+CONVERSACIÓN:
+{texto_completo}
+
+Extrae los siguientes datos del paciente:
+- Nombre completo (separar en nombre, apellido_paterno, apellido_materno si están disponibles)
+- Edad (número)
+- Email 
+- Teléfono
+
+IMPORTANTE:
+- Busca la información en las respuestas del Usuario
+- Si el apellido materno no fue mencionado, usa cadena vacía ""
+- La edad debe ser un número
+- El teléfono puede tener cualquier formato
+
+Responde ÚNICAMENTE en formato JSON válido, sin texto adicional.
+
+Si encontraste todos los datos mínimos (nombre, edad, email, teléfono), responde así:
+{{
+    "nombre": "nombre_encontrado",
+    "apellido_paterno": "apellido_encontrado",
+    "apellido_materno": "apellido_materno_o_vacio",
+    "edad": numero,
+    "email": "email@ejemplo.com",
+    "telefono": "numero_telefono"
+}}
+
+Si NO encontraste los datos mínimos, responde SOLO:
+{{"datos_completos": false}}
+"""
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.modelo,
+                messages=[
+                    {
+                        'role': 'system',
+                        'content': 'Eres un asistente experto en extraer datos estructurados de conversaciones. Respondes SOLO en formato JSON válido, sin explicaciones adicionales.'
+                    },
+                    {
+                        'role': 'user',
+                        'content': prompt_extraccion
+                    }
+                ],
+                max_tokens=400,
+                temperature=0.1
+            )
+            
+            respuesta_json = response.choices[0].message.content.strip()
+            print(f"[DEBUG] Respuesta de extracción: {respuesta_json}")
+            
+            # Limpiar markdown si existe
+            if '```json' in respuesta_json:
+                respuesta_json = respuesta_json.split('```json')[1].split('```')[0].strip()
+            elif '```' in respuesta_json:
+                respuesta_json = respuesta_json.split('```')[1].split('```')[0].strip()
+            
+            datos = json.loads(respuesta_json)
+            print(f"[DEBUG] Datos parseados: {datos}")
+            
+            # Validar que tenga los datos mínimos
+            if datos.get('datos_completos') == False:
+                print(f"[DEBUG] La IA indicó que no hay datos completos")
+                return None
+            
+            # Validar campos requeridos
+            campos_requeridos = ['nombre', 'edad', 'email', 'telefono']
+            if not all([datos.get(campo) for campo in campos_requeridos]):
+                print(f"[DEBUG] Faltan campos requeridos. Datos: {datos}")
+                return None
+            
+            # Asegurar que apellido_paterno esté presente (puede estar vacío)
+            if 'apellido_paterno' not in datos:
+                datos['apellido_paterno'] = ''
+            if 'apellido_materno' not in datos:
+                datos['apellido_materno'] = ''
+            
+            print(f"[DEBUG] Datos extraídos exitosamente: {datos}")
+            
+            # Guardar en conversación
+            conversacion['datos_paciente'] = datos
+            self.guardar_conversacion(conversacion)
+            
+            return datos
+            
+        except json.JSONDecodeError as e:
+            print(f"[ERROR] Error al parsear JSON: {e}")
+            print(f"[ERROR] Respuesta recibida: {respuesta_json}")
+            return None
+        except Exception as e:
+            print(f"[ERROR] Error al extraer datos: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
+    def crear_cita_desde_conversacion(self, conversacion_id):
+        """
+        Crea una cita en la base de datos basándose en la conversación
+        
+        Args:
+            conversacion_id (str): UUID de la conversación
+        
+        Returns:
+            dict: Resultado de la creación de la cita
+        """
+        from ..models import Paciente, Medico, Cita
+        
+        print(f"[DEBUG] Intentando crear cita para conversacion_id: {conversacion_id}")
+        
+        conversacion = self.obtener_conversacion(conversacion_id)
+        
+        if not conversacion:
+            print(f"[DEBUG] Conversación no encontrada")
+            return {
+                'exito': False,
+                'error': 'Conversación no encontrada o expirada'
+            }
+        
+        print(f"[DEBUG] Conversación encontrada: {conversacion.get('conversacion_id')}")
+        
+        # Extraer datos si no están disponibles
+        datos_paciente = conversacion.get('datos_paciente')
+        print(f"[DEBUG] Datos paciente en conversación: {datos_paciente}")
+        
+        if not datos_paciente:
+            print(f"[DEBUG] Intentando extraer datos del paciente...")
+            datos_paciente = self.extraer_datos_paciente(conversacion_id)
+            print(f"[DEBUG] Datos extraídos: {datos_paciente}")
+        
+        if not datos_paciente:
+            print(f"[DEBUG] No se pudieron extraer datos del paciente")
+            return {
+                'exito': False,
+                'error': 'No se pudieron extraer los datos completos del paciente. Asegúrate de proporcionar: nombre completo, edad, email y teléfono.'
+            }
+        
+        especialidad = conversacion.get('especialidad_sugerida')
+        print(f"[DEBUG] Especialidad sugerida: {especialidad}")
+        
+        if not especialidad:
+            print(f"[DEBUG] No hay especialidad definida")
+            return {
+                'exito': False,
+                'error': 'No se ha determinado la especialidad requerida. Por favor, menciona qué tipo de médico necesitas.'
+            }
+        
+        try:
+            # Buscar o crear paciente
+            email = datos_paciente.get('email')
+            print(f"[DEBUG] Email del paciente: {email}")
+            
+            # Calcular fecha de nacimiento aproximada
+            edad = datos_paciente.get('edad', 30)
+            fecha_nacimiento = (datetime.now() - timedelta(days=edad*365)).date()
+            
+            print(f"[DEBUG] Creando/buscando paciente con email: {email}")
+            
+            paciente, created = Paciente.objects.get_or_create(
+                email=email,
+                defaults={
+                    'nombre': datos_paciente.get('nombre', ''),
+                    'apellido_paterno': datos_paciente.get('apellido_paterno', ''),
+                    'apellido_materno': datos_paciente.get('apellido_materno', ''),
+                    'fecha_nacimiento': fecha_nacimiento,
+                    'sexo': 'O',  # Otro por defecto
+                    'telefono': datos_paciente.get('telefono', ''),
+                }
+            )
+            
+            print(f"[DEBUG] Paciente {'creado' if created else 'encontrado'}: {paciente.id}")
+            
+            # Si el paciente ya existía, actualizar teléfono si es diferente
+            if not created and datos_paciente.get('telefono'):
+                paciente.telefono = datos_paciente.get('telefono')
+                paciente.save()
+            
+            # Buscar médico disponible de la especialidad
+            print(f"[DEBUG] Buscando médico de especialidad: {especialidad}")
+            
+            # Intentar búsqueda exacta primero
+            medico = Medico.objects.filter(
+                especialidad=especialidad,
+                activo=True,
+                acepta_nuevos_pacientes=True
+            ).first()
+            
+            # Si no encuentra, intentar búsqueda sin acentos (case insensitive)
+            if not medico:
+                print(f"[DEBUG] No se encontró con búsqueda exacta, intentando sin acentos...")
+                # Normalizar especialidad removiendo acentos
+                from unicodedata import normalize
+                especialidad_normalizada = ''.join(
+                    c for c in normalize('NFD', especialidad)
+                    if not c.isspace() and ord(c) < 0x300 or ord(c) > 0x36f
+                ).lower()
+                
+                print(f"[DEBUG] Especialidad normalizada: {especialidad_normalizada}")
+                
+                # Buscar médicos y filtrar manualmente
+                medicos_disponibles = Medico.objects.filter(
+                    activo=True,
+                    acepta_nuevos_pacientes=True
+                )
+                
+                for m in medicos_disponibles:
+                    esp_medico_normalizada = ''.join(
+                        c for c in normalize('NFD', m.especialidad)
+                        if not c.isspace() and ord(c) < 0x300 or ord(c) > 0x36f
+                    ).lower()
+                    
+                    if especialidad_normalizada == esp_medico_normalizada:
+                        medico = m
+                        print(f"[DEBUG] Médico encontrado con búsqueda normalizada: {m.especialidad}")
+                        break
+            
+            if not medico:
+                print(f"[DEBUG] No se encontró médico de {especialidad}")
+                return {
+                    'exito': False,
+                    'error': f'No hay médicos disponibles de {especialidad} en este momento'
+                }
+            
+            print(f"[DEBUG] Médico encontrado: {medico.nombre_completo()}")
+            
+            # Crear la cita para el siguiente día hábil
+            # Buscar un horario disponible
+            hoy = datetime.now().date()
+            fecha_cita = hoy + timedelta(days=1)
+            
+            # Si es fin de semana, mover a lunes
+            while fecha_cita.weekday() >= 5:  # 5=Sábado, 6=Domingo
+                fecha_cita += timedelta(days=1)
+            
+            # Buscar una hora disponible para ese médico
+            horas_disponibles = ['09:00:00', '10:00:00', '11:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00']
+            hora_asignada = None
+            
+            print(f"[DEBUG] Buscando horario disponible para {medico.nombre_completo()} el {fecha_cita}")
+            
+            for hora in horas_disponibles:
+                # Verificar si ya existe una cita en ese horario
+                cita_existente = Cita.objects.filter(
+                    medico=medico,
+                    fecha=fecha_cita,
+                    hora=hora
+                ).exists()
+                
+                if not cita_existente:
+                    hora_asignada = hora
+                    print(f"[DEBUG] Horario disponible encontrado: {hora}")
+                    break
+            
+            # Si no hay horarios disponibles ese día, intentar el siguiente día
+            intentos = 0
+            max_intentos = 10  # Buscar hasta 10 días
+            
+            while not hora_asignada and intentos < max_intentos:
+                fecha_cita += timedelta(days=1)
+                
+                # Saltar fines de semana
+                while fecha_cita.weekday() >= 5:
+                    fecha_cita += timedelta(days=1)
+                
+                print(f"[DEBUG] Intentando siguiente fecha: {fecha_cita}")
+                
+                for hora in horas_disponibles:
+                    cita_existente = Cita.objects.filter(
+                        medico=medico,
+                        fecha=fecha_cita,
+                        hora=hora
+                    ).exists()
+                    
+                    if not cita_existente:
+                        hora_asignada = hora
+                        print(f"[DEBUG] Horario disponible encontrado: {hora}")
+                        break
+                
+                intentos += 1
+            
+            if not hora_asignada:
+                print(f"[DEBUG] No se encontró horario disponible en los próximos {max_intentos} días")
+                return {
+                    'exito': False,
+                    'error': f'No hay horarios disponibles para {medico.nombre_completo()} en los próximos días. Por favor, contacta directamente al consultorio.'
+                }
+            
+            print(f"[DEBUG] Fecha de cita calculada: {fecha_cita} a las {hora_asignada}")
+            
+            # Convertir hora a formato 12h para mostrar
+            hora_obj = datetime.strptime(hora_asignada, '%H:%M:%S')
+            hora_12h = hora_obj.strftime('%I:%M %p')
+            
+            # Crear la cita
+            cita = Cita.objects.create(
+                paciente=paciente,
+                medico=medico,
+                fecha=fecha_cita,
+                hora=hora_asignada,
+                consultorio=medico.direccion or 'Por asignar',
+                estado='AGENDADA',
+                motivo=f'Consulta por síntomas. Especialidad: {especialidad}'
+            )
+            
+            print(f"[DEBUG] Cita creada exitosamente: ID={cita.id}")
+            
+            # Actualizar conversación
+            conversacion['cita_creada'] = {
+                'cita_id': cita.id,
+                'paciente': paciente.nombre_completo(),
+                'medico': medico.nombre_completo(),
+                'fecha': str(fecha_cita),
+                'hora': '10:00 AM'
+            }
+            self.guardar_conversacion(conversacion)
+            
+            return {
+                'exito': True,
+                'cita_id': cita.id,
+                'paciente': paciente.nombre_completo(),
+                'medico': medico.nombre_completo(),
+                'especialidad': medico.especialidad,
+                'fecha': str(fecha_cita),
+                'hora': hora_12h,
+                'consultorio': cita.consultorio,
+                'mensaje': f'✅ Cita creada exitosamente para {paciente.nombre_completo()} con {medico.nombre_completo()} el {fecha_cita.strftime("%d/%m/%Y")} a las {hora_12h}'
+            }
+            
+        except Exception as e:
+            print(f"[ERROR] Error al crear la cita: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {
+                'exito': False,
+                'error': f'Error al crear la cita: {str(e)}'
+            }

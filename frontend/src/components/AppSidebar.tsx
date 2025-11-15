@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Calendar, FileText, Activity, GraduationCap, ClipboardPlus } from "lucide-react";
+import { Home, Calendar, FileText, Activity, GraduationCap, Bot } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ import {
 
 const navigation = [
   { name: "Inicio", href: "/", icon: Home },
-  { name: "Nueva Cita", href: "/nueva-cita", icon: ClipboardPlus },
+  { name: "Asistente Virtual", href: "/nueva-cita", icon: Bot },
   { name: "Historial de Citas", href: "/historial", icon: FileText },
   { name: "Calendario de citas", href: "/calendario", icon: Calendar },
   { name: "Médicos", href: "/medicos", icon: GraduationCap }

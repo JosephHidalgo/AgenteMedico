@@ -9,6 +9,7 @@ from medical.views_api import (
     AsistenteMensajeView,
     AsistenteHistorialView,
     AsistenteFinalizarView,
+    AsistenteCrearCitaView,
     # Médicos
     MedicoListView,
     MedicoDetailView,
@@ -33,6 +34,7 @@ urlpatterns = [
     path('api/asistente/mensaje/', AsistenteMensajeView.as_view(), name='asistente_mensaje'),
     path('api/asistente/historial/<str:conversacion_id>/', AsistenteHistorialView.as_view(), name='asistente_historial'),
     path('api/asistente/finalizar/<str:conversacion_id>/', AsistenteFinalizarView.as_view(), name='asistente_finalizar'),
+    path('api/asistente/crear-cita/', AsistenteCrearCitaView.as_view(), name='asistente_crear_cita'),
     
     # ======================
     # MÉDICOS

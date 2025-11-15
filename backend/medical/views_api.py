@@ -125,6 +125,40 @@ class AsistenteFinalizarView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+class AsistenteCrearCitaView(APIView):
+    """
+    POST /api/asistente/crear-cita/
+    Crea una cita basándose en la conversación del asistente
+    
+    Body:
+        {
+            "conversacion_id": "uuid"
+        }
+    """
+    
+    def post(self, request):
+        conversacion_id = request.data.get('conversacion_id')
+        
+        print(f"[DEBUG] Recibido conversacion_id: {conversacion_id}")
+        print(f"[DEBUG] Request data: {request.data}")
+        
+        if not conversacion_id:
+            return Response({
+                'exito': False,
+                'error': 'Se requiere conversacion_id'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        asistente = AsistenteVirtualService()
+        resultado = asistente.crear_cita_desde_conversacion(conversacion_id)
+        
+        print(f"[DEBUG] Resultado: {resultado}")
+        
+        if resultado['exito']:
+            return Response(resultado, status=status.HTTP_201_CREATED)
+        else:
+            return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
+
+
 # ====================
 # MÉDICOS
 # ====================

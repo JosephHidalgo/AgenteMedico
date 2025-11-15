@@ -63,6 +63,34 @@ export interface MedicosResponse {
   medicos: Medico[];
 }
 
+export interface MensajeChat {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp?: string;
+}
+
+export interface IniciarConversacionResponse {
+  exito: boolean;
+  conversacion_id: string;
+  mensaje: string;
+}
+
+export interface EnviarMensajeResponse {
+  exito: boolean;
+  conversacion_id: string;
+  respuesta: string;
+  intencion?: string;
+  requiere_datos?: boolean;
+  especialidad_sugerida?: string;
+  es_urgente?: boolean;
+}
+
+export interface HistorialResponse {
+  exito: boolean;
+  conversacion_id: string;
+  mensajes: MensajeChat[];
+}
+
 // ====================================
 // UTILIDADES
 // ====================================
@@ -184,6 +212,61 @@ export const medicosService = {
    */
   obtenerHorarios: async (medicoId: number, fecha: string) => {
     return fetchAPI(`/api/medicos/${medicoId}/horarios/?fecha=${fecha}`);
+  },
+};
+
+/**
+ * Servicio del Asistente Virtual
+ */
+export const asistenteService = {
+  /**
+   * Inicia una nueva conversación con el asistente
+   */
+  iniciarConversacion: async (): Promise<IniciarConversacionResponse> => {
+    return fetchAPI<IniciarConversacionResponse>('/api/asistente/iniciar/', {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Envía un mensaje al asistente
+   */
+  enviarMensaje: async (conversacionId: string, mensaje: string): Promise<EnviarMensajeResponse> => {
+    return fetchAPI<EnviarMensajeResponse>('/api/asistente/mensaje/', {
+      method: 'POST',
+      body: JSON.stringify({
+        conversacion_id: conversacionId,
+        mensaje: mensaje,
+      }),
+    });
+  },
+
+  /**
+   * Obtiene el historial de una conversación
+   */
+  obtenerHistorial: async (conversacionId: string): Promise<HistorialResponse> => {
+    return fetchAPI<HistorialResponse>(`/api/asistente/historial/${conversacionId}/`);
+  },
+
+  /**
+   * Finaliza una conversación
+   */
+  finalizarConversacion: async (conversacionId: string): Promise<{ exito: boolean; mensaje: string }> => {
+    return fetchAPI(`/api/asistente/finalizar/${conversacionId}/`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Crea una cita basándose en la conversación
+   */
+  crearCita: async (conversacionId: string): Promise<any> => {
+    return fetchAPI('/api/asistente/crear-cita/', {
+      method: 'POST',
+      body: JSON.stringify({
+        conversacion_id: conversacionId,
+      }),
+    });
   },
 };
 
