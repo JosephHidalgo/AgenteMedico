@@ -98,42 +98,21 @@ const PacientesPage = () => {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Users className="w-8 h-8 text-blue-600" />
-              Pacientes
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Lista de pacientes que han agendado citas médicas
-            </p>
-          </div>
-          
-          {/* Búsqueda */}
-          <form onSubmit={handleBuscar} className="flex gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Buscar por nombre..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="pl-9 w-64"
-              />
-            </div>
-            <Button type="submit" variant="default">
-              Buscar
-            </Button>
-            {busquedaActiva && (
-              <Button type="button" variant="outline" onClick={limpiarBusqueda}>
-                Limpiar
-              </Button>
-            )}
-          </form>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+            <Users className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
+            Pacientes
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            Lista de pacientes que han agendado citas médicas
+          </p>
         </div>
 
-        {/* Estadísticas rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Búsqueda + Estadísticas en una fila */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Búsqueda */}
+
+          {/* Estadísticas */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
@@ -158,7 +137,7 @@ const PacientesPage = () => {
                   <p className="text-2xl font-bold">
                     {pacientes.reduce((sum, p) => sum + p.total_citas, 0)}
                   </p>
-                  <p className="text-sm text-muted-foreground">Total citas agendadas</p>
+                  <p className="text-sm text-muted-foreground">Total citas</p>
                 </div>
               </div>
             </CardContent>
@@ -174,9 +153,35 @@ const PacientesPage = () => {
                   <p className="text-2xl font-bold">
                     {[...new Set(pacientes.flatMap(p => p.especialidades))].length}
                   </p>
-                  <p className="text-sm text-muted-foreground">Especialidades consultadas</p>
+                  <p className="text-sm text-muted-foreground">Especialidades</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+          <Card className="sm:col-span-2 lg:col-span-1">
+            <CardContent className="pt-6">
+              <form onSubmit={handleBuscar} className="space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    className="pl-9 w-full"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" variant="default" size="sm" className="flex-1">
+                    Buscar
+                  </Button>
+                  {busquedaActiva && (
+                    <Button type="button" variant="outline" size="sm" onClick={limpiarBusqueda} className="flex-1">
+                      Limpiar
+                    </Button>
+                  )}
+                </div>
+              </form>
             </CardContent>
           </Card>
         </div>
@@ -222,9 +227,9 @@ const PacientesPage = () => {
                         <div className="p-2 bg-blue-100 rounded-full">
                           <User className="h-5 w-5 text-blue-600" />
                         </div>
-                        <div>
-                          <CardTitle className="text-lg">{paciente.nombre_completo}</CardTitle>
-                          <p className="text-sm text-muted-foreground">
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-base sm:text-lg truncate">{paciente.nombre_completo}</CardTitle>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             {paciente.edad} años • {getSexoLabel(paciente.sexo)}
                           </p>
                         </div>
@@ -237,26 +242,26 @@ const PacientesPage = () => {
                   
                   <CardContent className="space-y-4">
                     {/* Información de contacto (parcialmente oculta) */}
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span className="font-mono">{paciente.telefono_oculto}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-mono text-sm">{paciente.email_oculto}</span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="font-mono text-sm truncate">{paciente.email_oculto}</span>
                       </div>
                     </div>
 
                     {/* Estadísticas de citas */}
-                    <div className="flex items-center justify-between text-sm bg-muted/50 rounded-lg p-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm bg-muted/50 rounded-lg p-3">
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span>
                           <strong>{paciente.total_citas}</strong> {paciente.total_citas === 1 ? 'cita' : 'citas'}
                         </span>
                       </div>
-                      <div className="text-muted-foreground">
+                      <div className="text-muted-foreground text-xs sm:text-sm">
                         Última: {formatearFecha(paciente.ultima_cita)}
                       </div>
                     </div>
@@ -287,11 +292,6 @@ const PacientesPage = () => {
             )}
           </div>
         )}
-
-        {/* Nota de privacidad */}
-        <div className="text-center text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-          🔒 Los datos de contacto se muestran parcialmente ocultos por motivos de privacidad
-        </div>
       </div>
     </DashboardLayout>
   );

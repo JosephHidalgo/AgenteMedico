@@ -4,11 +4,12 @@ import { ReactNode } from "react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  noPadding?: boolean;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, noPadding = false }: DashboardLayoutProps) {
   return (
-    <div className="p-8">
+    <div className={noPadding ? "" : "p-8"}>
       {children}
     </div>
   );

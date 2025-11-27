@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sistema de Gestión de Citas Médicas",
   description: "Sistema para gestionar citas médicas y pacientes",
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({
@@ -31,14 +36,14 @@ export default function RootLayout({
       >
         <SidebarProvider>
           <AppSidebar />
-          <main className="flex-1 w-full">
+          <main className="flex-1 w-full flex flex-col min-h-screen">
             <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
               <div className="flex h-14 items-center px-4 gap-4">
                 <SidebarTrigger className="-ml-1" />
                 <div className="flex-1" />
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col overflow-hidden">
               {children}
             </div>
           </main>
