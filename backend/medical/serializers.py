@@ -154,3 +154,94 @@ class RespuestaAsistenteSerializer(serializers.Serializer):
     
     class Meta:
         fields = ['conversacion_id', 'respuesta', 'intencion', 'especialidad_sugerida', 'es_urgente']
+
+
+# ====================
+# PACIENTES
+# ====================
+
+class PacienteListSerializer(serializers.ModelSerializer):
+    """
+    Serializer para listar pacientes con datos sensibles enmascarados.
+    """
+    nombre_completo = serializers.SerializerMethodField()
+    edad = serializers.SerializerMethodField()
+    telefono_oculto = serializers.SerializerMethodField()
+    email_oculto = serializers.SerializerMethodField()
+    especialidades = serializers.SerializerMethodField()
+    total_citas = serializers.SerializerMethodField()
+    ultima_cita = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Paciente
+        fields = [
+            'id', 'nombre_completo', 'edad', 'sexo',
+            'telefono_oculto', 'email_oculto',
+            'especialidades', 'total_citas', 'ultima_cita',
+            'fecha_registro', 'activo'
+        ]
+    
+    def _ocultar_telefono(self, telefono: str) -> str:
+        """
+        Oculta parcialmente un número de teléfono.
+        """
+        if not telefono or len(telefono) < 6:
+            return telefono or ''
+        
+        # Mostrar primeros 3 y últimos 2 caracteres
+        inicio = telefono[:3]
+        fin = telefono[-2:]
+        medio = '*' * (len(telefono) - 5)
+        return f"{inicio}{medio}{fin}"
+    
+    def _ocultar_email(self, email: str) -> str:
+        """
+        Oculta parcialmente un email.
+        """
+        if not email or '@' not in email:
+            return email or ''
+        
+        partes = email.split('@')
+        nombre = partes[0]
+        dominio = partes[1]
+        
+        if len(nombre) <= 2:
+            nombre_oculto = nombre[0] + '*' * (len(nombre) - 1)
+        else:
+            # Mostrar primeros 2 caracteres
+            nombre_oculto = nombre[:2] + '*' * (len(nombre) - 2)
+        
+        return f"{nombre_oculto}@{dominio}"
+    
+    def get_nombre_completo(self, obj):
+        return obj.nombre_completo()
+    
+    def get_edad(self, obj):
+        return obj.edad()
+    
+    def get_telefono_oculto(self, obj):
+        return self._ocultar_telefono(obj.telefono)
+    
+    def get_email_oculto(self, obj):
+        return self._ocultar_email(obj.email)
+    
+    def get_especialidades(self, obj):
+        """
+        Obtiene lista de especialidades únicas de los médicos 
+        con los que el paciente ha tenido citas.
+        """
+        especialidades = obj.citas.select_related('medico').values_list(
+            'medico__especialidad', flat=True
+        ).distinct()
+        return list(especialidades)
+    
+    def get_total_citas(self, obj):
+        """Total de citas del paciente"""
+        return obj.citas.count()
+    
+    def get_ultima_cita(self, obj):
+        """Fecha de la última cita del paciente"""
+        ultima = obj.citas.order_by('-fecha').first()
+        if ultima:
+            return ultima.fecha.isoformat()
+        return None

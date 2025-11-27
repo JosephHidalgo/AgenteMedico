@@ -2,7 +2,7 @@
  * API Service
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // ====================================
 // TIPOS DE RESPUESTA
@@ -89,6 +89,26 @@ export interface HistorialResponse {
   exito: boolean;
   conversacion_id: string;
   mensajes: MensajeChat[];
+}
+
+export interface Paciente {
+  id: number;
+  nombre_completo: string;
+  edad: number;
+  sexo: 'M' | 'F' | 'O';
+  telefono_oculto: string;
+  email_oculto: string;
+  especialidades: string[];
+  total_citas: number;
+  ultima_cita: string | null;
+  fecha_registro: string;
+  activo: boolean;
+}
+
+export interface PacientesResponse {
+  exito: boolean;
+  cantidad: number;
+  pacientes: Paciente[];
 }
 
 // ====================================
@@ -193,6 +213,36 @@ export const citasService = {
       method: 'POST',
       body: JSON.stringify({ motivo }),
     });
+  },
+};
+
+/**
+ * Servicio de Pacientes
+ */
+export const pacientesService = {
+  /**
+   * Lista todos los pacientes que han sacado citas.
+   * Los datos sensibles (teléfono, email) vienen enmascarados.
+   */
+  listar: async (filtros?: {
+    activo?: boolean;
+    buscar?: string;
+  }): Promise<PacientesResponse> => {
+    const params = new URLSearchParams();
+    
+    if (filtros) {
+      if (filtros.activo !== undefined) {
+        params.append('activo', filtros.activo.toString());
+      }
+      if (filtros.buscar) {
+        params.append('buscar', filtros.buscar);
+      }
+    }
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `/api/pacientes/?${queryString}` : '/api/pacientes/';
+    
+    return fetchAPI<PacientesResponse>(endpoint);
   },
 };
 

@@ -4,23 +4,20 @@ URLs para el módulo medical - API REST
 
 from django.urls import path
 from medical.views_api import (
-    # Asistente Virtual
     AsistenteIniciarView,
     AsistenteMensajeView,
     AsistenteHistorialView,
     AsistenteFinalizarView,
     AsistenteCrearCitaView,
-    # Médicos
+    PacienteListView,
     MedicoListView,
     MedicoDetailView,
     MedicoHorariosView,
-    # Citas
     CitaListView,
     CitaCreateView,
     CitaDetailView,
     CitaPDFView,
     CitaCancelarView,
-    # Estadísticas
     EstadisticasView,
 )
 
@@ -35,6 +32,11 @@ urlpatterns = [
     path('api/asistente/historial/<str:conversacion_id>/', AsistenteHistorialView.as_view(), name='asistente_historial'),
     path('api/asistente/finalizar/<str:conversacion_id>/', AsistenteFinalizarView.as_view(), name='asistente_finalizar'),
     path('api/asistente/crear-cita/', AsistenteCrearCitaView.as_view(), name='asistente_crear_cita'),
+    
+    # ======================
+    # PACIENTES
+    # ======================
+    path('api/pacientes/', PacienteListView.as_view(), name='paciente_list'),
     
     # ======================
     # MÉDICOS

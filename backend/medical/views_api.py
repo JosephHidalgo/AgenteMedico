@@ -8,8 +8,9 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from datetime import datetime, date
 
-from .models import Medico, Cita, HorarioMedico
+from .models import Paciente, Medico, Cita, HorarioMedico
 from .serializers import (
+    PacienteListSerializer,
     MedicoSerializer,
     CitaListSerializer,
     CitaDetailSerializer,
@@ -157,6 +158,52 @@ class AsistenteCrearCitaView(APIView):
             return Response(resultado, status=status.HTTP_201_CREATED)
         else:
             return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ====================
+# PACIENTES
+# ====================
+
+class PacienteListView(APIView):
+    """
+    GET /api/pacientes/
+    Lista todos los pacientes que han sacado citas.
+    Los datos sensibles (teléfono, email) se devuelven parcialmente ocultos.
+    Incluye las especialidades médicas en las que cada paciente ha tenido citas.
+    
+    Filtros opcionales: 
+        ?activo=true/false
+        ?buscar=nombre
+    """
+    
+    def get(self, request):
+        # Solo pacientes que tienen al menos una cita
+        pacientes = Paciente.objects.filter(
+            citas__isnull=False
+        ).distinct().prefetch_related('citas__medico')
+        
+        # Filtrar por estado activo
+        activo = request.query_params.get('activo')
+        if activo is not None:
+            pacientes = pacientes.filter(activo=activo.lower() == 'true')
+        
+        # Filtrar por nombre
+        buscar = request.query_params.get('buscar')
+        if buscar:
+            from django.db.models import Q
+            pacientes = pacientes.filter(
+                Q(nombre__icontains=buscar) |
+                Q(apellido_paterno__icontains=buscar) |
+                Q(apellido_materno__icontains=buscar)
+            )
+        
+        serializer = PacienteListSerializer(pacientes, many=True)
+        
+        return Response({
+            'exito': True,
+            'cantidad': pacientes.count(),
+            'pacientes': serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 # ====================
