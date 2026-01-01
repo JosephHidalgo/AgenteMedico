@@ -89,7 +89,6 @@ Tu función principal es:
 **ESPECIALIDADES DISPONIBLES**:
 - Medicina General
 - Cardiología
-- Endocrinología
 - Dermatología
 - Pediatría
 - Traumatología
@@ -112,12 +111,8 @@ Responde siempre en español y de forma amigable."""
         # Mensaje inicial del asistente
         mensaje_inicial = """¡Hola! 👋 Soy tu asistente médico virtual.
 
-¿En qué puedo ayudarte hoy?
-
-🩺 **Evaluar síntomas**
-📅 **Agendar una cita médica**
-
-Por favor, cuéntame en qué puedo asistirte."""
+Puedo evaluar tus síntomas o ayudarte a agendar una cita médica.
+¿En qué puedo ayudarte hoy? :)"""
         
         # Crear estructura de conversación en Redis
         conversacion_data = {
@@ -317,8 +312,8 @@ Por favor, cuéntame en qué puedo asistirte."""
             'medicina general': 'Medicina General',
             'cardiología': 'Cardiología',
             'cardiologia': 'Cardiología',
-            'endocrinología': 'Endocrinología',
-            'endocrinologia': 'Endocrinología',
+            # 'endocrinología': 'Endocrinología',
+            # 'endocrinologia': 'Endocrinología',
             'dermatología': 'Dermatología',
             'dermatologia': 'Dermatología',
             'pediatría': 'Pediatría',
@@ -563,34 +558,12 @@ Si NO encontraste los datos mínimos, responde SOLO:
             }
         
         try:
-            # Buscar o crear paciente
-            email = datos_paciente.get('email')
-            print(f"[DEBUG] Email del paciente: {email}")
-            
             # Calcular fecha de nacimiento aproximada
+            email = datos_paciente.get('email')
             edad = datos_paciente.get('edad', 30)
             fecha_nacimiento = (datetime.now() - timedelta(days=edad*365)).date()
             
-            print(f"[DEBUG] Creando/buscando paciente con email: {email}")
-            
-            paciente, created = Paciente.objects.get_or_create(
-                email=email,
-                defaults={
-                    'nombre': datos_paciente.get('nombre', ''),
-                    'apellido_paterno': datos_paciente.get('apellido_paterno', ''),
-                    'apellido_materno': datos_paciente.get('apellido_materno', ''),
-                    'fecha_nacimiento': fecha_nacimiento,
-                    'sexo': 'O',  # Otro por defecto
-                    'telefono': datos_paciente.get('telefono', ''),
-                }
-            )
-            
-            print(f"[DEBUG] Paciente {'creado' if created else 'encontrado'}: {paciente.id}")
-            
-            # Si el paciente ya existía, actualizar teléfono si es diferente
-            if not created and datos_paciente.get('telefono'):
-                paciente.telefono = datos_paciente.get('telefono')
-                paciente.save()
+            print(f"[DEBUG] Email del paciente: {email}")
             
             # Buscar médico disponible de la especialidad
             print(f"[DEBUG] Buscando médico de especialidad: {especialidad}")
@@ -704,43 +677,70 @@ Si NO encontraste los datos mínimos, responde SOLO:
             
             print(f"[DEBUG] Fecha de cita calculada: {fecha_cita} a las {hora_asignada}")
             
-            # Convertir hora a formato 12h para mostrar
-            hora_obj = datetime.strptime(hora_asignada, '%H:%M:%S')
+            # Convertir hora string a objeto time
+            hora_obj = datetime.strptime(hora_asignada, '%H:%M:%S').time()
             hora_12h = hora_obj.strftime('%I:%M %p')
             
-            # Crear la cita
-            cita = Cita.objects.create(
-                paciente=paciente,
-                medico=medico,
-                fecha=fecha_cita,
-                hora=hora_asignada,
-                consultorio=medico.direccion or 'Por asignar',
-                estado='AGENDADA',
-                motivo=f'Consulta por síntomas. Especialidad: {especialidad}'
-            )
+            # Preparar datos para el servicio de creación de citas
+            datos_paciente_servicio = {
+                'nombre': datos_paciente.get('nombre', ''),
+                'apellido_paterno': datos_paciente.get('apellido_paterno', ''),
+                'apellido_materno': datos_paciente.get('apellido_materno', ''),
+                'fecha_nacimiento': fecha_nacimiento,
+                'sexo': 'O',  # Otro por defecto
+                'email': email,
+                'telefono': datos_paciente.get('telefono', ''),
+            }
             
-            print(f"[DEBUG] Cita creada exitosamente: ID={cita.id}")
+            datos_cita_servicio = {
+                'medico_id': medico.id,
+                'fecha': fecha_cita,
+                'hora': hora_obj,  # Pasar como objeto time, no string
+                'motivo': f'Consulta por síntomas. Especialidad: {especialidad}',
+                'sintomas_iniciales': conversacion.get('sintomas', '')
+            }
+            
+            print(f"[DEBUG] Usando CitaService para crear cita y enviar email...")
+            
+            # Usar el servicio de citas que incluye envío de email
+            from .cita_service import CitaService
+            
+            try:
+                cita, creada, mensaje_servicio = CitaService.crear_cita(
+                    datos_paciente_servicio, 
+                    datos_cita_servicio
+                )
+                
+                print(f"[DEBUG] Cita creada exitosamente: ID={cita.id}")
+                print(f"[DEBUG] Mensaje del servicio: {mensaje_servicio}")
+                
+            except ValueError as e:
+                print(f"[ERROR] Error de validación: {str(e)}")
+                return {
+                    'exito': False,
+                    'error': str(e)
+                }
             
             # Actualizar conversación
             conversacion['cita_creada'] = {
                 'cita_id': cita.id,
-                'paciente': paciente.nombre_completo(),
-                'medico': medico.nombre_completo(),
+                'paciente': cita.paciente.nombre_completo(),
+                'medico': cita.medico.nombre_completo(),
                 'fecha': str(fecha_cita),
-                'hora': '10:00 AM'
+                'hora': hora_12h
             }
             self.guardar_conversacion(conversacion)
             
             return {
                 'exito': True,
                 'cita_id': cita.id,
-                'paciente': paciente.nombre_completo(),
-                'medico': medico.nombre_completo(),
-                'especialidad': medico.especialidad,
+                'paciente': cita.paciente.nombre_completo(),
+                'medico': cita.medico.nombre_completo(),
+                'especialidad': cita.medico.especialidad,
                 'fecha': str(fecha_cita),
                 'hora': hora_12h,
                 'consultorio': cita.consultorio,
-                'mensaje': f'✅ Cita creada exitosamente para {paciente.nombre_completo()} con {medico.nombre_completo()} el {fecha_cita.strftime("%d/%m/%Y")} a las {hora_12h}'
+                'mensaje': mensaje_servicio  # Incluye si el email fue enviado
             }
             
         except Exception as e:

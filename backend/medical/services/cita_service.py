@@ -5,6 +5,9 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import datetime, date as dt_date
 from ..models import Cita, Paciente, Medico
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CitaService:
@@ -151,7 +154,7 @@ class CitaService:
     @transaction.atomic
     def crear_cita(datos_paciente, datos_cita):
         """
-        Crea una nueva cita médica
+        Crea una nueva cita médica y envía confirmación por email
         
         Args:
             datos_paciente (dict): Datos del paciente
@@ -174,6 +177,12 @@ class CitaService:
             datos_cita['fecha'],
             datos_cita['hora']
         )
+        
+        print("\n" + "="*80)
+        print("🚀 INICIANDO CREACIÓN DE CITA")
+        print("="*80)
+        logger.info(f"=== CREANDO CITA ===")
+        logger.info(f"Disponibilidad validada: {disponible}")
         
         if not disponible:
             raise ValueError(mensaje)
@@ -200,7 +209,40 @@ class CitaService:
             estado='AGENDADA'
         )
         
-        mensaje_final = "Cita creada exitosamente"
+        print(f"✅ Cita #{cita.id} creada exitosamente")
+        print(f"   Paciente: {paciente.email}")
+        print(f"   Médico: {medico.nombre} {medico.apellido_paterno}")
+        print(f"   Fecha: {datos_cita['fecha']}")
+        logger.info(f"Cita #{cita.id} creada exitosamente para {paciente.email}")
+        
+        # Enviar email de confirmación con PDF
+        print(f"\n📧 Intentando enviar email de confirmación...")
+        logger.info(f"Intentando enviar email de confirmación a {paciente.email}...")
+        try:
+            from .email_service import EmailService
+            email_service = EmailService()
+            resultado_email = email_service.enviar_confirmacion_cita(cita)
+            
+            if resultado_email['exito']:
+                print(f"✅ EMAIL ENVIADO EXITOSAMENTE!")
+                print(f"   Email ID: {resultado_email.get('email_id')}")
+                logger.info(f"Email de confirmación enviado para cita {cita.id}")
+                mensaje_final = "Cita creada exitosamente. Email de confirmación enviado."
+            else:
+                print(f"⚠️  ERROR al enviar email: {resultado_email['mensaje']}")
+                logger.warning(f"Error al enviar email para cita {cita.id}: {resultado_email['mensaje']}")
+                mensaje_final = "Cita creada exitosamente, pero hubo un problema al enviar el email."
+        except Exception as e:
+            print(f"❌ EXCEPCIÓN al enviar email: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            logger.error(f"Error inesperado al enviar email para cita {cita.id}: {str(e)}")
+            mensaje_final = "Cita creada exitosamente"
+        
+        print("="*80)
+        print(f"✅ PROCESO COMPLETADO: {mensaje_final}")
+        print("="*80 + "\n")
+        
         if paciente_creado:
             mensaje_final += " (nuevo paciente registrado)"
         

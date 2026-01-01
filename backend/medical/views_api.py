@@ -362,6 +362,9 @@ class CitaListView(APIView):
     
     def post(self, request):
         """Crear nueva cita"""
+        print("\n🔵 [CitaListView.post] Endpoint /api/calendario/citas/ llamado")
+        print(f"   Datos recibidos: {request.data}")
+        
         serializer = CitaCreateSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -392,7 +395,9 @@ class CitaListView(APIView):
         }
         
         try:
+            print(f"🟢 [CitaListView.post] Llamando a CitaService.crear_cita()")
             cita, creado, mensaje_servicio = CitaService.crear_cita(datos_paciente, datos_cita)
+            print(f"🟢 [CitaListView.post] Cita creada con ID: {cita.id}")
             
             serializer_respuesta = CitaDetailSerializer(cita)
             
@@ -430,6 +435,9 @@ class CitaCreateView(APIView):
     """
     
     def post(self, request):
+        print("\n🔵 [CitaCreateView.post] Endpoint /api/citas/ llamado")
+        print(f"   Datos recibidos: {request.data}")
+        
         serializer = CitaCreateSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -458,7 +466,9 @@ class CitaCreateView(APIView):
         }
         
         try:
+            print(f"🟢 [CitaCreateView.post] Llamando a CitaService.crear_cita()")
             cita, creada, mensaje = CitaService.crear_cita(datos_paciente, datos_cita)
+            print(f"🟢 [CitaCreateView.post] Cita creada con ID: {cita.id}")
             
             serializer_respuesta = CitaDetailSerializer(cita)
             

@@ -20,6 +20,9 @@ python-decouple==3.8
 reportlab==4.0.7
 Pillow==10.1.0
 
+# Servicio de Email
+resend==2.7.0
+
 # CORS
 django-cors-headers==4.3.1
 
