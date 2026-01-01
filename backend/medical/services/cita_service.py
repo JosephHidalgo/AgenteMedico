@@ -178,12 +178,6 @@ class CitaService:
             datos_cita['hora']
         )
         
-        print("\n" + "="*80)
-        print("🚀 INICIANDO CREACIÓN DE CITA")
-        print("="*80)
-        logger.info(f"=== CREANDO CITA ===")
-        logger.info(f"Disponibilidad validada: {disponible}")
-        
         if not disponible:
             raise ValueError(mensaje)
         
