@@ -9,7 +9,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, noPadding = false }: DashboardLayoutProps) {
   return (
-    <div className={noPadding ? "" : "p-8"}>
+    <div className={`${noPadding ? "" : "px-4 py-6 sm:px-6 sm:py-8"} overflow-x-hidden w-full max-w-full box-border`}>
       {children}
     </div>
   );
