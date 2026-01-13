@@ -200,23 +200,23 @@ const AsistenteVirtualPage = () => {
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col bg-muted/30">
       {/* Header estilo WhatsApp */}
-      <header className="bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3 shadow-md flex-shrink-0">
+      <header className="bg-[#79b236] text-white px-4 py-3 flex items-center gap-3 shadow-md flex-shrink-0">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => router.push('/')}
-          className="text-primary-foreground hover:bg-primary-foreground/10"
+          className="text-white hover:bg-white/10"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
         
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <Bot className="w-6 h-6" />
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="font-semibold text-base truncate">Asistente Virtual Médico</h1>
-            <p className="text-xs text-primary-foreground/80">
+            <p className="text-xs text-white/80">
               {iniciando ? 'Conectando...' : cargando ? 'Escribiendo...' : 'En línea'}
             </p>
           </div>
@@ -227,7 +227,7 @@ const AsistenteVirtualPage = () => {
           size="icon"
           onClick={reiniciarConversacion}
           disabled={iniciando}
-          className="text-primary-foreground hover:bg-primary-foreground/10 flex-shrink-0"
+          className="text-white hover:bg-white/10 flex-shrink-0"
           title="Nueva conversación"
         >
           <RotateCcw className="w-5 h-5" />
@@ -337,7 +337,7 @@ const AsistenteVirtualPage = () => {
           <div className="mb-2">
             <Button
               type="button"
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              className="w-full bg-[#79b236] hover:bg-[#79b236]/90 text-white border-[#79b236]"
               onClick={confirmarCrearCita}
               disabled={creandoCita}
             >
@@ -384,7 +384,7 @@ const AsistenteVirtualPage = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-primary" />
+              <AlertCircle className="w-5 h-5 text-[#79b236]" />
               Confirmar Cita Médica
             </DialogTitle>
             <DialogDescription>
@@ -413,7 +413,7 @@ const AsistenteVirtualPage = () => {
       <Dialog open={modalExito} onOpenChange={setModalExito}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-600">
+            <DialogTitle className="flex items-center gap-2 text-[#79b236]">
               <CheckCircle2 className="w-6 h-6" />
               ¡Cita Creada Exitosamente!
             </DialogTitle>
@@ -424,16 +424,16 @@ const AsistenteVirtualPage = () => {
           
           {datosCita && (
             <div className="space-y-4 py-4">
-              <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
-                <User className="w-5 h-5 text-primary mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-[#79b236]/5 rounded-lg border border-[#79b236]/10">
+                <User className="w-5 h-5 text-[#79b236] mt-0.5" />
                 <div>
                   <p className="text-xs text-muted-foreground">Paciente</p>
                   <p className="font-semibold text-foreground">{datosCita.paciente}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 bg-secondary/5 rounded-lg">
-                <Stethoscope className="w-5 h-5 text-secondary mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-[#5fa7c1]/5 rounded-lg border border-[#5fa7c1]/10">
+                <Stethoscope className="w-5 h-5 text-[#5fa7c1] mt-0.5" />
                 <div>
                   <p className="text-xs text-muted-foreground">Médico</p>
                   <p className="font-semibold text-foreground">{datosCita.medico}</p>
@@ -442,8 +442,8 @@ const AsistenteVirtualPage = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-start gap-2 p-3 bg-green-500/5 rounded-lg">
-                  <Calendar className="w-5 h-5 text-green-600 mt-0.5" />
+                <div className="flex items-start gap-2 p-3 bg-[#79b236]/5 rounded-lg border border-[#79b236]/10">
+                  <Calendar className="w-5 h-5 text-[#79b236] mt-0.5" />
                   <div>
                     <p className="text-xs text-muted-foreground">Fecha</p>
                     <p className="font-semibold text-sm text-foreground">
@@ -456,8 +456,8 @@ const AsistenteVirtualPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 p-3 bg-orange-500/5 rounded-lg">
-                  <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
+                <div className="flex items-start gap-2 p-3 bg-[#5fa7c1]/5 rounded-lg border border-[#5fa7c1]/10">
+                  <Clock className="w-5 h-5 text-[#5fa7c1] mt-0.5" />
                   <div>
                     <p className="text-xs text-muted-foreground">Hora</p>
                     <p className="font-semibold text-sm text-foreground">{datosCita.hora}</p>

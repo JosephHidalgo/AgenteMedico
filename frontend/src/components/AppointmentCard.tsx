@@ -26,15 +26,15 @@ export default function AppointmentCard({
   const getStatusColor = () => {
     switch (status) {
       case "AGENDADA":
-        return "bg-green-500/10 text-green-700 dark:text-green-400";
+        return "bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20";
       case "COMPLETADA":
-        return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+        return "bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20";
       case "CANCELADA":
-        return "bg-red-500/10 text-red-700 dark:text-red-400";
+        return "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20";
       case "EXPIRADA":
-        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+        return "bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20";
       default:
-        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+        return "bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20";
     }
   };
 
@@ -54,11 +54,11 @@ export default function AppointmentCard({
   };
 
   return (
-    <Card className={`p-4 transition-all hover:shadow-md ${isToday ? 'border-2 border-secondary shadow-lg' : ''}`}>
+    <Card className={`p-4 transition-all hover:shadow-md ${isToday ? 'border-2 border-[#79b236] shadow-lg' : 'border border-border'}`}>
       {/* Paciente como protagonista */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${isToday ? 'from-secondary to-secondary/80' : 'from-primary to-primary-glow'} text-primary-foreground`}>
+          <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isToday ? 'bg-[#79b236] text-white' : 'bg-[#5fa7c1] text-white'}`}>
             <User className="h-6 w-6" />
           </div>
           <div>
@@ -68,7 +68,7 @@ export default function AppointmentCard({
         </div>
         <div className="flex flex-col gap-1 items-end">
           {isToday && (
-            <Badge className="bg-secondary text-secondary-foreground">
+            <Badge className="bg-[#79b236] text-white border-[#79b236]">
               Hoy
             </Badge>
           )}

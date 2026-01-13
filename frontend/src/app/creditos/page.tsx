@@ -48,11 +48,11 @@ const CreditosPage = () => {
 
                 {/* Desarrollador Card */}
                 <Card className="overflow-hidden border-border">
-                    <div className="bg-gradient-to-r from-primary/80 to-secondary/80 h-24" />
+                    <div className="bg-gradient-to-r from-[#79b236] to-[#5fa7c1] h-24" />
                     <CardContent className="relative pt-0">
                         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12">
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-card border-4 border-card shadow-lg">
-                                <User className="h-12 w-12 text-primary" />
+                                <User className="h-12 w-12 text-[#79b236]" />
                             </div>
                             <div className="text-center sm:text-left pb-2">
                                 <h2 className="text-2xl font-bold text-foreground">{desarrollador.nombre}</h2>

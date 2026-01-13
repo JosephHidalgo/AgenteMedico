@@ -123,7 +123,7 @@ const Index = () => {
           {/* Title Section */}
           <div className="lg:col-span-1">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              ¡Bienvenido! 👋
+              ¡Bienvenido!
             </h1>
             <p className="text-base text-muted-foreground mb-3">
               Agenda tu cita médica de forma rápida y sencilla
@@ -143,24 +143,32 @@ const Index = () => {
               icon={Calendar}
               value={cargando ? "..." : estadisticas.total_citas.toString()}
               subtitle="Citas registradas"
-              iconClassName="bg-primary/10 text-primary"
+              iconClassName="bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20"
             />
             <HealthCard
               title="Total de Pacientes"
               icon={Users}
               value={cargando ? "..." : estadisticas.total_pacientes.toString()}
               subtitle="Pacientes registrados"
-              iconClassName="bg-secondary/10 text-secondary"
+              iconClassName="bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20"
             />
           </div>
         </div>
 
         {/* Próximas Citas - Marquee */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
-            Próximas Citas
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Calendar className="h-6 w-6 text-[#79b236]" />
+              Próximas Citas
+            </h2>
+            <Link href="/citas-proximas">
+              <Button variant="ghost" size="sm" className="gap-2">
+                Ver todas las citas
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
           
           {cargando ? (
             <div className="w-full text-center py-8">
@@ -168,22 +176,24 @@ const Index = () => {
             </div>
           ) : citasProximas.length === 0 ? (
             <div className="w-full flex items-center justify-center py-6 px-4">
-              <div className="max-w-md text-center space-y-3">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-primary" />
+              <div className="max-w-2xl flex items-center gap-6">
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-[#79b236]/10 flex items-center justify-center border border-[#79b236]/20">
+                  <Calendar className="h-8 w-8 text-[#79b236]" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  No hay citas próximas
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Sé el primero en agendar una cita médica
-                </p>
-                <Link href="/nueva-cita">
-                  <Button className="gap-2">
-                    Agendar cita
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+                <div className="flex-1 text-left space-y-2">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    No hay citas próximas
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Sé el primero en agendar una cita médica
+                  </p>
+                  <Link href="/nueva-cita">
+                    <Button className="gap-2 mt-3">
+                      Agendar cita
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           ) : (
@@ -227,10 +237,18 @@ const Index = () => {
 
         {/* Citas Anteriores - Marquee */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-secondary" />
-            Citas Anteriores
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Calendar className="h-6 w-6 text-[#5fa7c1]" />
+              Citas Anteriores
+            </h2>
+            <Link href="/citas-anteriores">
+              <Button variant="ghost" size="sm" className="gap-2">
+                Ver todas las citas
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
           
           {cargando ? (
             <div className="w-full text-center py-8">

@@ -9,18 +9,18 @@ import { Phone, Mail, Award } from 'lucide-react';
 
 const getColorEspecialidad = (especialidad: string) => {
   const colores: Record<string, string> = {
-    'Medicina General': 'bg-blue-100 text-blue-800',
-    'Medicina Interna': 'bg-sky-100 text-sky-800',
-    'Cardiología': 'bg-red-100 text-red-800',
-    'Dermatología': 'bg-purple-100 text-purple-800',
-    'Pediatría': 'bg-green-100 text-green-800',
-    'Neurología': 'bg-yellow-100 text-yellow-800',
-    'Oftalmología': 'bg-cyan-100 text-cyan-800',
-    'Traumatología': 'bg-orange-100 text-orange-800',
-    'Ginecología': 'bg-pink-100 text-pink-800',
-    'Psicología': 'bg-indigo-100 text-indigo-800',
+    'Medicina General': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+    'Medicina Interna': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+    'Cardiología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+    'Dermatología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+    'Pediatría': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+    'Neurología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+    'Oftalmología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+    'Traumatología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+    'Ginecología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+    'Psicología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
   };
-  return colores[especialidad] || 'bg-gray-100 text-gray-800';
+  return colores[especialidad] || 'bg-gray-100 text-gray-800 border border-gray-200';
 };
 
 export default function MedicosPage() {
@@ -105,7 +105,7 @@ export default function MedicosPage() {
                     </Badge>
                   </div>
                   {medico.activo && (
-                    <div className="w-3 h-3 bg-green-500 rounded-full" title="Activo"></div>
+                    <div className="w-3 h-3 bg-[#79b236] rounded-full border border-[#79b236]" title="Activo"></div>
                   )}
                 </div>
               </CardHeader>

@@ -51,18 +51,18 @@
   --card-foreground: oklch(0.25 0.015 240);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.015 240);
-  --primary: oklch(0.62 0.15 235);
+  --primary: #79b236;
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.65 0.12 185);
+  --secondary: #5fa7c1;
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.96 0.005 240);
   --muted-foreground: oklch(0.55 0.01 240);
-  --accent: oklch(0.65 0.12 185);
+  --accent: #79b236;
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.65 0.22 25);
   --border: oklch(0.90 0.005 240);
   --input: oklch(0.90 0.005 240);
-  --ring: oklch(0.62 0.15 235);
+  --ring: #79b236;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -70,12 +70,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.30 0.015 240);
-  --sidebar-primary: oklch(0.62 0.15 235);
+  --sidebar-primary: #79b236;
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.97 0.005 240);
-  --sidebar-accent-foreground: oklch(0.30 0.015 240);
-  --sidebar-border: oklch(0.93 0.005 240);
-  --sidebar-ring: oklch(0.62 0.15 235);
+  --sidebar-accent: rgba(121, 178, 54, 0.08);
+  --sidebar-accent-foreground: #79b236;
+  --sidebar-border: #79b236;
+  --sidebar-ring: #79b236;
 }
 
 .dark {
@@ -85,18 +85,18 @@
   --card-foreground: oklch(0.95 0.005 240);
   --popover: oklch(0.22 0.015 240);
   --popover-foreground: oklch(0.95 0.005 240);
-  --primary: oklch(0.65 0.16 235);
+  --primary: #79b236;
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.68 0.13 185);
+  --secondary: #5fa7c1;
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.25 0.01 240);
   --muted-foreground: oklch(0.65 0.008 240);
-  --accent: oklch(0.68 0.13 185);
+  --accent: #79b236;
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.62 0.20 25);
   --border: oklch(0.30 0.01 240);
   --input: oklch(0.30 0.01 240);
-  --ring: oklch(0.65 0.16 235);
+  --ring: #79b236;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -104,12 +104,12 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.20 0.015 240);
   --sidebar-foreground: oklch(0.90 0.005 240);
-  --sidebar-primary: oklch(0.65 0.16 235);
+  --sidebar-primary: #79b236;
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.25 0.01 240);
-  --sidebar-accent-foreground: oklch(0.90 0.005 240);
-  --sidebar-border: oklch(0.28 0.01 240);
-  --sidebar-ring: oklch(0.65 0.16 235);
+  --sidebar-accent: rgba(121, 178, 54, 0.12);
+  --sidebar-accent-foreground: #79b236;
+  --sidebar-border: #79b236;
+  --sidebar-ring: #79b236;
 }
 
 @layer base {
@@ -181,11 +181,23 @@
 
 /* Colores según estado de citas */
 .calendario-container .react-calendar__tile.cita-agendada {
-  @apply bg-green-500/20 border-2 border-green-500 font-bold hover:bg-green-500/30;
+  background-color: rgba(121, 178, 54, 0.2);
+  border: 2px solid #79b236;
+  font-weight: bold;
+}
+
+.calendario-container .react-calendar__tile.cita-agendada:hover {
+  background-color: rgba(121, 178, 54, 0.3);
 }
 
 .calendario-container .react-calendar__tile.cita-completada {
-  @apply bg-blue-500/20 border-2 border-blue-500 font-bold hover:bg-blue-500/30;
+  background-color: rgba(95, 167, 193, 0.2);
+  border: 2px solid #5fa7c1;
+  font-weight: bold;
+}
+
+.calendario-container .react-calendar__tile.cita-completada:hover {
+  background-color: rgba(95, 167, 193, 0.3);
 }
 
 .calendario-container .react-calendar__tile.cita-cancelada {
@@ -193,11 +205,15 @@
 }
 
 .calendario-container .react-calendar__tile.cita-agendada.react-calendar__tile--active {
-  @apply bg-green-600 text-white border-green-600;
+  background-color: #79b236;
+  color: white;
+  border-color: #79b236;
 }
 
 .calendario-container .react-calendar__tile.cita-completada.react-calendar__tile--active {
-  @apply bg-blue-600 text-white border-blue-600;
+  background-color: #5fa7c1;
+  color: white;
+  border-color: #5fa7c1;
 }
 
 .calendario-container .react-calendar__tile.cita-cancelada.react-calendar__tile--active {

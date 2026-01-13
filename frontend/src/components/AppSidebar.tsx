@@ -15,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -34,11 +35,19 @@ const navigation = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    // Cerrar el sidebar solo en móvil
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
+    <Sidebar collapsible="icon" className="bg-sidebar">
       {/* Logo Header */}
-      <SidebarHeader className="border-b border-sidebar-border px-6 py-4 group-data-[collapsible=icon]:px-3">
+      <SidebarHeader className="px-6 py-4 group-data-[collapsible=icon]:px-3">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
             <Image 
               src="/logo.svg" 
@@ -76,7 +85,11 @@ export function AppSidebar() {
                                 : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary"
                             )}
                           >
-                            <Link href={item.href} className="flex items-center gap-3">
+                            <Link 
+                              href={item.href} 
+                              className="flex items-center gap-3"
+                              onClick={handleLinkClick}
+                            >
                               <item.icon className="h-5 w-5" />
                               <span>{item.name}</span>
                             </Link>
@@ -96,7 +109,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* Footer - System Info */}
-      <SidebarFooter className="border-t border-sidebar-border p-4 group-data-[collapsible=icon]:p-3">
+      <SidebarFooter className="p-4 group-data-[collapsible=icon]:p-3">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
             <Image 
               src="/logo.svg" 

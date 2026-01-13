@@ -105,10 +105,10 @@ export default function CalendarioPage() {
 
   const getEstadoBadge = (estado: string) => {
     const colores: Record<string, string> = {
-      AGENDADA: "bg-green-500/10 text-green-700 dark:text-green-400",
-      COMPLETADA: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-      CANCELADA: "bg-red-500/10 text-red-700 dark:text-red-400",
-      EXPIRADA: "bg-gray-500/10 text-gray-700 dark:text-gray-400"
+      AGENDADA: "bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20",
+      COMPLETADA: "bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20",
+      CANCELADA: "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20",
+      EXPIRADA: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20"
     };
     
     const labels: Record<string, string> = {
@@ -147,13 +147,13 @@ export default function CalendarioPage() {
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Agendadas</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-[#79b236]">
                 {citasDelMes.filter(c => c.estado === 'AGENDADA').length}
               </p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Completadas</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-[#5fa7c1]">
                 {citasDelMes.filter(c => c.estado === 'COMPLETADA').length}
               </p>
             </div>
@@ -199,11 +199,11 @@ export default function CalendarioPage() {
                 <p className="text-sm font-medium text-foreground mb-3">Leyenda:</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+                    <div className="h-4 w-4 rounded bg-[#79b236]/20 border-2 border-[#79b236]"></div>
                     <span className="text-xs sm:text-sm text-muted-foreground">Agendada</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 rounded bg-blue-500/20 border-2 border-blue-500"></div>
+                    <div className="h-4 w-4 rounded bg-[#5fa7c1]/20 border-2 border-[#5fa7c1]"></div>
                     <span className="text-xs sm:text-sm text-muted-foreground">Completada</span>
                   </div>
                   <div className="flex items-center gap-2">

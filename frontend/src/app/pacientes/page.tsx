@@ -81,17 +81,17 @@ const PacientesPage = () => {
 
   const getColorEspecialidad = (especialidad: string) => {
     const colores: Record<string, string> = {
-      'Medicina General': 'bg-blue-100 text-blue-800',
-      'Medicina Interna': 'bg-sky-100 text-sky-800',
-      'Cardiología': 'bg-red-100 text-red-800',
-      'Dermatología': 'bg-purple-100 text-purple-800',
-      'Pediatría': 'bg-green-100 text-green-800',
-      'Neurología': 'bg-yellow-100 text-yellow-800',
-      'Oftalmología': 'bg-cyan-100 text-cyan-800',
-      'Traumatología': 'bg-orange-100 text-orange-800',
-      'Ginecología': 'bg-pink-100 text-pink-800',
+      'Medicina General': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+      'Medicina Interna': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+      'Cardiología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+      'Dermatología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+      'Pediatría': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+      'Neurología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+      'Oftalmología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
+      'Traumatología': 'bg-[#5fa7c1]/10 text-[#5fa7c1] border border-[#5fa7c1]/20',
+      'Ginecología': 'bg-[#79b236]/10 text-[#79b236] border border-[#79b236]/20',
     };
-    return colores[especialidad] || 'bg-gray-100 text-gray-800';
+    return colores[especialidad] || 'bg-gray-100 text-gray-800 border border-gray-200';
   };
 
   return (
@@ -116,8 +116,8 @@ const PacientesPage = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Users className="h-6 w-6 text-blue-600" />
+                <div className="p-3 bg-[#5fa7c1]/10 rounded-full border border-[#5fa7c1]/20">
+                  <Users className="h-6 w-6 text-[#5fa7c1]" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{pacientes.length}</p>
@@ -130,8 +130,8 @@ const PacientesPage = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-100 rounded-full">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                <div className="p-3 bg-[#79b236]/10 rounded-full border border-[#79b236]/20">
+                  <Calendar className="h-6 w-6 text-[#79b236]" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">
@@ -189,7 +189,7 @@ const PacientesPage = () => {
         {/* Estado de carga y error */}
         {cargando && (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#5fa7c1]" />
             <span className="ml-2 text-muted-foreground">Cargando pacientes...</span>
           </div>
         )}
@@ -224,8 +224,8 @@ const PacientesPage = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-full">
-                          <User className="h-5 w-5 text-blue-600" />
+                        <div className="p-2 bg-[#5fa7c1]/10 rounded-full border border-[#5fa7c1]/20">
+                          <User className="h-5 w-5 text-[#5fa7c1]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <CardTitle className="text-base sm:text-lg truncate">{paciente.nombre_completo}</CardTitle>

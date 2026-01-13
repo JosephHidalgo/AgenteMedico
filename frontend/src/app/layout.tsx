@@ -57,7 +57,7 @@ export default function RootLayout({
                     className="w-8 h-auto"
                   />
                   <div>
-                    <h1 className="text-xl font-bold text-primary">MedBot</h1>
+                    <h1 className="text-xl font-bold text-[#79b236]">MedBot</h1>
                   </div>
                 </div>
                 
